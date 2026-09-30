@@ -308,6 +308,10 @@ The scans have to run on GitHub, so the code needs to be in **your own** reposit
 ```bash
 cp -r /workspaces/*/lab-starter ~/devsecops-lab
 cd ~/devsecops-lab
+
+# Leave the planted secrets behind - see the note below.
+rm -rf secrets-demo
+
 git init -b main
 git add .
 git commit -m "lab starter"
@@ -315,6 +319,15 @@ gh repo create devsecops-lab --public --source=. --push
 ```
 
 - [ ] The command printed a URL, and I can see my files on GitHub
+
+> 🧠 **Why delete `secrets-demo/` first?** GitHub runs **push protection** on public
+> repositories: it scans what you are pushing and *refuses the push* if it finds something
+> shaped like a real credential. The fake Stripe key in `config.js` is shaped exactly like a real
+> one — deliberately — so GitHub would block you here.
+>
+> **That is the same idea as the gate you are about to build**, moved even further left: it acts
+> before the code is even accepted, never mind built. You already scanned that file in Lab B.4;
+> it has done its job and does not need to be in this repository.
 
 > 📁 **Lab C runs from `~/devsecops-lab`.** Lab D goes back to `lab-starter`.
 
@@ -425,7 +438,10 @@ commit → SAST → build → SCA → image scan → 🚪 GATE → push to regis
 > 1. **Break it again on purpose.** Re-pin `lodash` to `4.17.15`, push, and confirm the gate
 >    still catches it. A gate you have never seen fail is a gate you cannot trust.
 > 2. Add a **fourth job** that runs `trivy fs --scanners secret .` and fails on a finding.
->    Now try to commit `secrets-demo/config.js` and watch it stop you.
+>    Then copy `secrets-demo/config.js` back in and try to push it. **GitHub will refuse the
+>    push before your workflow even runs** — that is push protection, a gate that sits to the
+>    left of yours. Read the error, follow its link, and notice that bypassing it requires a
+>    deliberate, recorded decision.
 > 3. Change the gate to `severity: 'CRITICAL'` only. The build goes green. Write one sentence
 >    explaining to a manager why that is worse than leaving it red.
 

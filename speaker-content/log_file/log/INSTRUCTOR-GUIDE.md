@@ -157,6 +157,20 @@ pods` in Lab D is your fallback: it is the same idea — numbers over time — w
    and the "two red jobs" moment collapses. The handout warns them; say it out loud too. If
    somebody does it anyway, they can `git checkout app/package.json` or simply re-pin the old
    versions by hand.
+10. **GitHub push protection will block Lab C unless `secrets-demo/` is removed first.** Public
+    repositories have push protection on by default. It scans the push, spots the fake Stripe
+    key in `config.js` — which is shaped like a real one deliberately — and **rejects the push**
+    with `GH013: Repository rule violations found`. Lab C.1 now does `rm -rf secrets-demo` right
+    after the copy, for exactly this reason. Do not let students skip that line, or forty people
+    are stuck at once on an error that has nothing to do with the lesson.
+
+    If somebody hits it anyway, the fix is the unblock URL printed in the error → choose
+    **"It's used in tests"** → push again. Worth doing *once on the projector* if it happens, and
+    worth naming: push protection is a gate even further left than the one they are building,
+    and bypassing it is a deliberate, recorded decision rather than a silent one.
+
+    **The same applies to you** when you publish the student repository, which does contain
+    `secrets-demo/`. Expect one block, allow it once, and you are done.
 
 ---
 
