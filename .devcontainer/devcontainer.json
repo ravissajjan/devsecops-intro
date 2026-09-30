@@ -1,0 +1,29 @@
+{
+  "name": "devsecops-lab",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+    "ghcr.io/devcontainers/features/node:1": { "version": "22" },
+    "ghcr.io/devcontainers/features/kubectl-helm-minikube:1": {
+      "version": "latest",
+      "helm": "latest",
+      "minikube": "latest"
+    }
+  },
+  // Trivy has no devcontainer feature, so it is installed from the vendor script.
+  // If this ever fails, the labs give a `docker run aquasec/trivy` fallback.
+  "postCreateCommand": "curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin",
+  "forwardPorts": [3000, 8080],
+  "portsAttributes": {
+    "3000": { "label": "app" },
+    "8080": { "label": "kubernetes service" }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-kubernetes-tools.vscode-kubernetes-tools",
+        "github.vscode-github-actions"
+      ]
+    }
+  }
+}

@@ -1,0 +1,34 @@
+#!/bin/sh
+# A pre-commit hook that refuses to let a credential into the repository.
+#
+# Install it into a repo you are working in:
+#     cp secrets-demo/pre-commit .git/hooks/pre-commit
+#     chmod +x .git/hooks/pre-commit
+#
+# This is "shift left" taken to its limit: the CI gate in Lab C stops a bad build, but this
+# stops the bad commit ever existing. Same mechanism as the gate - a non-zero exit code.
+#
+# LIMITS, and they matter:
+#   - Hooks live in .git/, so they are NOT shared when someone clones the repo.
+#   - Anyone can skip this entirely with `git commit --no-verify`.
+# So a hook is a helpful reminder for honest people. The pipeline gate is the actual control.
+# Real projects use pre-commit, husky or gitleaks to distribute hooks properly - but they all
+# come down to this: a script, an exit code.
+
+# Only look at lines being ADDED (^+), so pre-existing findings don't block unrelated work.
+# -i because real code writes apiKey, API_KEY and api_key, and all three are the same mistake.
+if git diff --cached -U0 | grep -niE '^\+.*(sk_live_|dckr_pat_|AKIA[0-9A-Za-z]{16}|-----BEGIN [A-Z ]*PRIVATE KEY-----|(password|passwd|secret|token|api_?key)\s*[:=]\s*["'"'"'][^"'"'"']{8,})'; then
+  echo ""
+  echo "BLOCKED: the lines above look like credentials."
+  echo ""
+  echo "  Read the value from the environment instead:"
+  echo "      const apiKey = process.env.API_KEY;"
+  echo ""
+  echo "  If this is genuinely a false positive, rerun with:"
+  echo "      git commit --no-verify"
+  echo "  ...and say so in the commit message, so the next person knows why."
+  echo ""
+  exit 1
+fi
+
+exit 0

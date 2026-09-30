@@ -1,0 +1,9 @@
+# Keep LF line endings in the repository, whatever platform files were authored on.
+# Without this, a shell script written on Windows arrives in a Linux Codespace with a
+# trailing CR on the shebang and fails with "bad interpreter: /bin/sh^M".
+* text=auto eol=lf
+
+# The git hook must stay LF even if someone edits it on Windows.
+# Note: the executable bit is a file mode, not an attribute - students run `chmod +x`
+# after copying it into .git/hooks/, which the lab instructions already cover.
+lab-starter/secrets-demo/pre-commit text eol=lf
